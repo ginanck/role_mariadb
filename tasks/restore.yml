@@ -1,0 +1,85 @@
+---
+- name: Validate Restore Parameters
+  ansible.builtin.assert:
+    that:
+      - mariadb_restore_source | length > 0
+      - mariadb_restore_database | length > 0
+    fail_msg: "mariadb_restore_source and mariadb_restore_database must be set when mariadb_restore_enabled is true"
+
+- name: Ensure Restore Target Database Exists
+  community.mysql.mysql_db:
+    name: "{{ mariadb_restore_database }}"
+    encoding: "{{ mariadb_character_set_server }}"
+    collation: "{{ mariadb_collation_server }}"
+    login_unix_socket: "{{ mariadb_socket }}"
+    state: present
+
+- name: Check If Database Already Has Tables
+  ansible.builtin.command:
+    cmd: >
+      mysql --socket={{ mariadb_socket }} -N -e
+      "SELECT COUNT(*) FROM information_schema.tables
+       WHERE table_schema='{{ mariadb_restore_database }}';"
+  register: mariadb_restore_table_count
+  changed_when: false
+
+- name: Restore Database from Backup
+  when: mariadb_restore_table_count.stdout | trim | int == 0
+  block:
+    - name: Create Temporary Restore Directory
+      ansible.builtin.tempfile:
+        state: directory
+        prefix: mariadb_restore_
+      register: mariadb_restore_tmpdir
+
+    - name: Copy Backup File to Target
+      ansible.builtin.copy:
+        src: "{{ mariadb_restore_source }}"
+        dest: "{{ mariadb_restore_tmpdir.path }}/backup{{ mariadb_restore_source | regex_search('\\.(sql|sql\\.gz|tar\\.gz|zip)$') }}"
+        mode: "0600"
+      register: mariadb_restore_copied
+
+    - name: Extract tar.gz Backup Archive
+      ansible.builtin.command:
+        cmd: "tar -xzf {{ mariadb_restore_copied.dest }} -C {{ mariadb_restore_tmpdir.path }}"
+      when: mariadb_restore_source is search('\\.tar\\.gz$')
+      changed_when: true
+
+    - name: Extract zip Backup Archive
+      ansible.builtin.command:
+        cmd: "unzip -o {{ mariadb_restore_copied.dest }} -d {{ mariadb_restore_tmpdir.path }}"
+      when: mariadb_restore_source is search('\\.zip$')
+      changed_when: true
+
+    - name: Decompress gzip SQL Backup
+      ansible.builtin.command:
+        cmd: "gunzip -f {{ mariadb_restore_copied.dest }}"
+      when: mariadb_restore_source is search('\\.sql\\.gz$')
+      changed_when: true
+
+    - name: Find SQL File in Restore Directory
+      ansible.builtin.find:
+        paths: "{{ mariadb_restore_tmpdir.path }}"
+        patterns: "*.sql"
+        recurse: true
+      register: mariadb_restore_sql_files
+
+    - name: Validate SQL File Found
+      ansible.builtin.assert:
+        that:
+          - mariadb_restore_sql_files.matched > 0
+        fail_msg: "No .sql file found in the backup archive"
+
+    - name: Import SQL Dump into Database
+      community.mysql.mysql_db:
+        name: "{{ mariadb_restore_database }}"
+        state: import
+        target: "{{ mariadb_restore_sql_files.files[0].path }}"
+        login_unix_socket: "{{ mariadb_socket }}"
+
+  always:
+    - name: Clean Up Temporary Restore Directory
+      ansible.builtin.file:
+        path: "{{ mariadb_restore_tmpdir.path }}"
+        state: absent
+      when: mariadb_restore_tmpdir is defined

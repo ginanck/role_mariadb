@@ -1,0 +1,10 @@
+---
+- name: Add MariaDB Repository
+  ansible.builtin.yum_repository:
+    name: mariadb
+    description: "MariaDB {{ mariadb_version }} Repository"
+    baseurl: "https://mirror.mariadb.org/yum/{{ mariadb_version }}/rhel/{{ ansible_facts['distribution_major_version'] }}/x86_64"
+    gpgkey: "https://mariadb.org/mariadb_release_signing_key.pgp"
+    gpgcheck: true
+    enabled: true
+    state: present

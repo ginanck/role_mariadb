@@ -1,0 +1,21 @@
+---
+- name: Install Repository Prerequisites
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - curl
+      - gnupg
+    state: present
+    update_cache: true
+
+- name: Add MariaDB Repository Signing Key
+  ansible.builtin.apt_key:
+    url: "https://mariadb.org/mariadb_release_signing_key.pgp"
+    state: present
+
+- name: Add MariaDB Repository
+  ansible.builtin.apt_repository:
+    repo: "deb https://mirror.mariadb.org/repo/{{ mariadb_version }}/{{ (ansible_facts['distribution'] == 'Ubuntu') | ternary('ubuntu', 'debian') }} {{ ansible_facts['distribution_release'] }} main"
+    state: present
+    filename: mariadb
+    update_cache: true

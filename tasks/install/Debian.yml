@@ -1,0 +1,6 @@
+---
+- name: Install MariaDB Packages
+  ansible.builtin.apt:
+    name: "{{ mariadb_packages }}"
+    state: present
+    update_cache: true

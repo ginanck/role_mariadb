@@ -1,0 +1,21 @@
+{#- jinja2: lstrip_blocks: true, trim_blocks: true -#}
+# {{ ansible_managed }}
+
+[mysqld]
+datadir                         = {{ mariadb_datadir }}
+socket                          = {{ mariadb_socket }}
+pid-file                        = {{ mariadb_pid_file }}
+log_error                       = {{ mariadb_log_error }}
+
+bind-address                    = {{ mariadb_bind_address }}
+port                            = {{ mariadb_port }}
+
+character-set-server            = {{ mariadb_character_set_server }}
+collation-server                = {{ mariadb_collation_server }}
+
+max_connections                 = {{ mariadb_max_connections }}
+max_allowed_packet              = {{ mariadb_max_allowed_packet }}
+
+innodb_buffer_pool_size         = {{ mariadb_innodb_buffer_pool_size }}
+innodb_log_file_size            = {{ mariadb_innodb_log_file_size }}
+innodb_flush_log_at_trx_commit  = {{ mariadb_innodb_flush_log_at_trx_commit }}
