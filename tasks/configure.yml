@@ -6,6 +6,14 @@
     enabled: "{{ mariadb_service_enabled }}"
     daemon_reload: true
 
+- name: Create MariaDB Log Directory
+  ansible.builtin.file:
+    path: "{{ mariadb_log_error | dirname }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: "0755"
+
 - name: Deploy MariaDB Server Configuration
   ansible.builtin.template:
     src: server.cnf.j2
@@ -14,3 +22,6 @@
     group: root
     mode: "0644"
   notify: restart mariadb
+
+- name: Flush Handlers to Apply Configuration Before Secure Tasks
+  ansible.builtin.meta: flush_handlers
