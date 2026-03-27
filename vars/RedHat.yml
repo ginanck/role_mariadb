@@ -1,0 +1,13 @@
+---
+mariadb_packages:
+  - MariaDB-server
+  - MariaDB-client
+  - MariaDB-backup
+  - python3-PyMySQL
+
+mariadb_config_dir: "/etc/my.cnf.d"
+mariadb_config_file: "server.cnf"
+
+mariadb_socket: "/var/lib/mysql/mysql.sock"
+mariadb_pid_file: "/var/lib/mysql/mysql.pid"
+mariadb_log_error: "/var/log/mariadb/mariadb.log"

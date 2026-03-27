@@ -1,0 +1,54 @@
+---
+# MariaDB version and repository
+mariadb_version: "11.4"
+
+# MariaDB service
+mariadb_service_name: mariadb
+mariadb_service_enabled: true
+mariadb_service_state: started
+
+# MariaDB configuration
+mariadb_port: 3306
+mariadb_bind_address: "127.0.0.1"
+mariadb_datadir: "/var/lib/mysql"
+mariadb_socket: "/var/run/mysqld/mysqld.sock"
+mariadb_pid_file: "/var/run/mysqld/mysqld.pid"
+mariadb_log_error: "/var/log/mysql/error.log"
+
+# Performance tuning
+mariadb_max_connections: 150
+mariadb_innodb_buffer_pool_size: "256M"
+mariadb_innodb_log_file_size: "64M"
+mariadb_innodb_flush_log_at_trx_commit: 1
+mariadb_max_allowed_packet: "64M"
+mariadb_character_set_server: "utf8mb4"
+mariadb_collation_server: "utf8mb4_unicode_520_ci"
+
+# Root credentials
+mariadb_root_password: "changeme"
+
+# Databases to create
+# mariadb_databases:
+#   - name: wordpress_db
+#     encoding: utf8mb4
+#     collation: utf8mb4_unicode_520_ci
+mariadb_databases: []
+
+# Users to create
+# mariadb_users:
+#   - name: wp_user
+#     password: "securepassword"
+#     host: "localhost"
+#     priv: "wordpress_db.*:ALL"
+mariadb_users: []
+
+# Restore configuration
+mariadb_restore_enabled: false
+mariadb_restore_source: ""
+# Supported formats: .sql, .sql.gz, .tar.gz, .zip
+# For .tar.gz and .zip, the archive must contain a single .sql file
+mariadb_restore_database: ""
+
+# Credential save configuration
+mariadb_credentials_save_enabled: true
+mariadb_credentials_save_path: "/opt/ansible/credentials/mariadb"

@@ -1,0 +1,9 @@
+---
+mariadb_packages:
+  - mariadb-server
+  - mariadb-client
+  - mariadb-backup
+  - python3-mysqldb
+
+mariadb_config_dir: "/etc/mysql/mariadb.conf.d"
+mariadb_config_file: "50-server.cnf"

@@ -1,0 +1,31 @@
+---
+- name: Include OS-Specific Variables
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] }}.yml"
+
+- name: Install MariaDB Repository
+  ansible.builtin.include_tasks: "repository/{{ ansible_facts['os_family'] }}.yml"
+
+- name: Install MariaDB Packages
+  ansible.builtin.include_tasks: "install/{{ ansible_facts['os_family'] }}.yml"
+
+- name: Configure MariaDB
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Secure MariaDB Installation
+  ansible.builtin.include_tasks: secure.yml
+
+- name: Create Databases
+  ansible.builtin.include_tasks: databases.yml
+  when: mariadb_databases | length > 0
+
+- name: Create Users
+  ansible.builtin.include_tasks: users.yml
+  when: mariadb_users | length > 0
+
+- name: Restore Database from Backup
+  ansible.builtin.include_tasks: restore.yml
+  when: mariadb_restore_enabled
+
+- name: Save MariaDB Credentials
+  ansible.builtin.include_tasks: credentials.yml
+  when: mariadb_credentials_save_enabled

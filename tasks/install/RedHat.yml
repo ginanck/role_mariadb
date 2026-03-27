@@ -1,0 +1,5 @@
+---
+- name: Install MariaDB Packages
+  ansible.builtin.dnf:
+    name: "{{ mariadb_packages }}"
+    state: present

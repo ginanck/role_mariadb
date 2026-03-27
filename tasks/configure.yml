@@ -1,0 +1,27 @@
+---
+- name: Ensure MariaDB Service Is Started
+  ansible.builtin.systemd:
+    name: "{{ mariadb_service_name }}"
+    state: started
+    enabled: "{{ mariadb_service_enabled }}"
+    daemon_reload: true
+
+- name: Create MariaDB Log Directory
+  ansible.builtin.file:
+    path: "{{ mariadb_log_error | dirname }}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: "0755"
+
+- name: Deploy MariaDB Server Configuration
+  ansible.builtin.template:
+    src: server.cnf.j2
+    dest: "{{ mariadb_config_dir }}/{{ mariadb_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart mariadb
+
+- name: Flush Handlers to Apply Configuration Before Secure Tasks
+  ansible.builtin.meta: flush_handlers

@@ -1,0 +1,26 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check MariaDB Service Is Running
+      ansible.builtin.command:
+        cmd: systemctl is-active mariadb
+      register: mariadb_service_status
+      changed_when: false
+
+    - name: Assert MariaDB Service Is Active
+      ansible.builtin.assert:
+        that:
+          - mariadb_service_status.stdout == 'active'
+
+    - name: Check MariaDB Is Listening on Port
+      ansible.builtin.command:
+        cmd: mysqladmin --socket=/var/run/mysqld/mysqld.sock ping
+      register: mariadb_ping
+      changed_when: false
+
+    - name: Assert MariaDB Is Responding
+      ansible.builtin.assert:
+        that:
+          - "'mysqld is alive' in mariadb_ping.stdout"

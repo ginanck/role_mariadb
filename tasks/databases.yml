@@ -1,0 +1,11 @@
+---
+- name: Create MariaDB Databases
+  community.mysql.mysql_db:
+    name: "{{ item.name }}"
+    encoding: "{{ item.encoding | default(mariadb_character_set_server) }}"
+    collation: "{{ item.collation | default(mariadb_collation_server) }}"
+    login_unix_socket: "{{ mariadb_socket }}"
+    state: present
+  loop: "{{ mariadb_databases }}"
+  loop_control:
+    label: "{{ item.name }}"

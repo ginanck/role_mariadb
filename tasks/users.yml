@@ -1,0 +1,13 @@
+---
+- name: Create MariaDB Users
+  community.mysql.mysql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    host: "{{ item.host | default('localhost') }}"
+    priv: "{{ item.priv }}"
+    login_unix_socket: "{{ mariadb_socket }}"
+    state: present
+  loop: "{{ mariadb_users }}"
+  loop_control:
+    label: "{{ item.name }}"
+  no_log: true
