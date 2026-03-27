@@ -40,16 +40,18 @@
       register: mariadb_restore_copied
 
     - name: Extract tar.gz Backup Archive
-      ansible.builtin.command:
-        cmd: "tar -xzf {{ mariadb_restore_copied.dest }} -C {{ mariadb_restore_tmpdir.path }}"
+      ansible.builtin.unarchive:
+        src: "{{ mariadb_restore_copied.dest }}"
+        dest: "{{ mariadb_restore_tmpdir.path }}"
+        remote_src: true
       when: mariadb_restore_source is search('\\.tar\\.gz$')
-      changed_when: true
 
     - name: Extract zip Backup Archive
-      ansible.builtin.command:
-        cmd: "unzip -o {{ mariadb_restore_copied.dest }} -d {{ mariadb_restore_tmpdir.path }}"
+      ansible.builtin.unarchive:
+        src: "{{ mariadb_restore_copied.dest }}"
+        dest: "{{ mariadb_restore_tmpdir.path }}"
+        remote_src: true
       when: mariadb_restore_source is search('\\.zip$')
-      changed_when: true
 
     - name: Decompress gzip SQL Backup
       ansible.builtin.command:
