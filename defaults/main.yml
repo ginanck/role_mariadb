@@ -50,5 +50,5 @@ mariadb_restore_source: ""
 mariadb_restore_database: ""
 
 # Credential save configuration
-mariadb_credentials_save_enabled: true
-mariadb_credentials_save_path: "/opt/ansible/credentials/mariadb"
+mariadb_credentials_save_enabled: false
+mariadb_credentials_save_path: "/tmp/mariadb"
